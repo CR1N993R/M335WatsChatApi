@@ -15,6 +15,7 @@ public class SocketService {
     private static boolean running = false;
     private final UserService userService;
     private final MessageService messageService;
+    private final OnlineService onlineService;
 
     private void initSocket() throws IOException {
         if (serverSocket == null || serverSocket.isClosed()) {
@@ -29,8 +30,10 @@ public class SocketService {
             while (running) {
                 try {
                     initSocket();
-                    new SocketHandler(serverSocket.accept(), userService, messageService);
-                } catch (IOException ignored) {
+                    new SocketHandler(serverSocket.accept(), userService, messageService, onlineService);
+                    System.out.println("Socket Connected");
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
@@ -41,7 +44,8 @@ public class SocketService {
             serverSocket.close();
             initSocket();
             running = false;
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

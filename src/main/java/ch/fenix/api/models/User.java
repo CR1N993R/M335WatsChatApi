@@ -1,8 +1,8 @@
 package ch.fenix.api.models;
 
-import ch.fenix.api.listeners.MessageReceiveListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,26 +10,18 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(unique = true)
     private String tel;
-    @Setter
-    private boolean online;
-    @Transient
-    private MessageReceiveListener receiveListener;
-    @OneToMany(mappedBy = "receiver")
+    @JsonIgnore
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
     private List<Message> messages = new ArrayList<>();
 
-    public boolean addMessage(Message message) {
-        if (online &&  receiveListener != null) {
-            receiveListener.messageReceived(message);
-            return false;
-        }else {
-            messages.add(message);
-            return true;
-        }
+    public User(String tel) {
+        this.tel = tel;
     }
 }
